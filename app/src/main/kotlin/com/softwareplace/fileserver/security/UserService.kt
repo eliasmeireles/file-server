@@ -1,10 +1,12 @@
 package com.softwareplace.fileserver.security
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.softwareplace.fileserver.properties.AppProperties
 import com.softwareplace.fileserver.rest.model.UserContentRest
 import com.softwareplace.fileserver.rest.model.UserInfoRest
 import com.softwareplace.fileserver.security.model.InMemoryUser
+import com.softwareplace.jsonlogger.log.kLogger
 import com.softwareplace.springsecurity.encrypt.Encrypt
 import com.softwareplace.springsecurity.exception.ApiBaseException
 import com.softwareplace.springsecurity.model.RequestUser
@@ -23,8 +25,8 @@ class UserService(
 
     private fun inMemoryUsers(): List<InMemoryUser> {
         val resource = ReadFilesUtils.readFileBytes(resourceLoader, properties.authorizationPath)
-
-        return objectMapper.readValue(resource, Array<InMemoryUser>::class.java).toList()
+        kLogger.info("Resource content: {}", String(resource))
+        return objectMapper.readValue(resource, object : TypeReference<List<InMemoryUser>>() {})
     }
 
     override fun findUser(user: RequestUser): InMemoryUser? {

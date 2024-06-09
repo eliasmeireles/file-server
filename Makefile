@@ -33,7 +33,8 @@ clean:
 	./gradlew clean
 
 deploy:
-	docker-compose build storage-api
-	docker-compose up -d --no-deps storage-api
-	docker-compose logs -f storage-api
+	./gradlew bootBuildImage
+	docker-compose build file-server
+	docker-compose up -d --no-deps file-server
+	docker-compose logs -f file-server
 

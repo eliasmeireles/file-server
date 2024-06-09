@@ -30,5 +30,11 @@ for pid in "${pids[@]}"; do
     wait "$pid"
 done
 
+mkdir -p /opt/file-server/sec/
+
+-DENV_JWT_PRIVATE_KEY="/home/eliasmeireles/Development/de-setup/utils/docker/SecreteGenerator/.generated/private.key"
+-DENV_JWT_PUBLIC_KEY="/home/eliasmeireles/Development/de-setup/utils/docker/SecreteGenerator/.generated/public.key"
+-DENV_STORAGE_PATH="/home/eliasmeireles/Downloads/"
+
 echo "All requests completed."
 
