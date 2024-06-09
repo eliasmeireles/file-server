@@ -6,7 +6,7 @@ target/
 
 ci
 
-.temp
+test
 ### STS ###
 .apt_generated
 .classpath
