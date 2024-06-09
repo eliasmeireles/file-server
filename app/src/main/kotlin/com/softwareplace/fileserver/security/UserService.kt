@@ -6,12 +6,13 @@ import com.softwareplace.fileserver.properties.AppProperties
 import com.softwareplace.fileserver.rest.model.UserContentRest
 import com.softwareplace.fileserver.rest.model.UserInfoRest
 import com.softwareplace.fileserver.security.model.InMemoryUser
-import com.softwareplace.jsonlogger.log.kLogger
+import com.softwareplace.fileserver.security.model.toInMemoryUser
 import com.softwareplace.springsecurity.encrypt.Encrypt
 import com.softwareplace.springsecurity.exception.ApiBaseException
 import com.softwareplace.springsecurity.model.RequestUser
 import com.softwareplace.springsecurity.service.AuthorizationUserService
 import com.softwareplace.springsecurity.util.ReadFilesUtils
+import jakarta.annotation.PostConstruct
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -23,28 +24,35 @@ class UserService(
     private val resourceLoader: ResourceLoader
 ) : AuthorizationUserService {
 
-    private fun inMemoryUsers(): List<InMemoryUser> {
+    @PostConstruct
+    fun postConstruct() {
+        if (inMemoryUsers.isEmpty()) {
+            throw RuntimeException("At least one user must be registered.")
+        }
+    }
+
+    private val inMemoryUsers: List<InMemoryUser> by lazy {
         val resource = ReadFilesUtils.readFileBytes(resourceLoader, properties.authorizationPath)
-        kLogger.info("Resource content: {}", String(resource))
-        return objectMapper.readValue(resource, object : TypeReference<List<InMemoryUser>>() {})
+        objectMapper.readValue(resource, object : TypeReference<List<UserContentRest>>() {})
+            .map(UserContentRest::toInMemoryUser)
     }
 
     override fun findUser(user: RequestUser): InMemoryUser? {
-        return inMemoryUsers().firstOrNull { it.username == user.username }
+        return inMemoryUsers.firstOrNull { it.username == user.username }
     }
 
     override fun findUser(authToken: String): InMemoryUser? {
-        return inMemoryUsers().firstOrNull { it.authToken() == authToken }
+        return inMemoryUsers.firstOrNull { it.authToken() == authToken }
     }
 
     override fun loadUserByUsername(username: String?): InMemoryUser? {
-        return inMemoryUsers().firstOrNull { it.authToken() == username }
+        return inMemoryUsers.firstOrNull { it.authToken() == username }
     }
 
     fun authorizationGen(userInfoRest: UserInfoRest): UserContentRest {
         val encrypt = Encrypt(userInfoRest.password)
 
-        val user: InMemoryUser? = inMemoryUsers().firstOrNull { it.username == userInfoRest.username }
+        val user: InMemoryUser? = inMemoryUsers.firstOrNull { it.username == userInfoRest.username }
 
         if (user != null) {
             throw ApiBaseException(status = HttpStatus.BAD_REQUEST, message = "Username is not available.")

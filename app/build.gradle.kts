@@ -30,3 +30,11 @@ dependencies {
     testKotlinMockito()
 }
 
+tasks.bootBuildImage {
+    System.getProperties().apply {
+        setProperty("BP_NATIVE_IMAGE", "true")
+        setProperty("BP_NATIVE_IMAGE_EXECUTABLE", "runner")
+    }
+}
+
+

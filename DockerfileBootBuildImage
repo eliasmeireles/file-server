@@ -1,8 +1,10 @@
+FROM docker.io/library/app:1.0.0 AS build
+
 FROM ubuntu:24.04
 
 LABEL mainers=eliasmflilico@gmail.com
 
-COPY ./app/build/native/nativeCompile/app /usr/bin/app
+COPY --from=build /workspace/com.softwareplace.fileserver.FileServerApplicationKt /usr/bin/app
 
 # Required by container health check
 RUN apt-get update \
