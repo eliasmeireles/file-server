@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  storage-api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        PORT: 80
+        PROFILE: dev
+        JAR_FILE: "./app/build/libs/app-1.0.0.jar"
+    image: storage-api
+    container_name: storage-api
+    restart: always
+    environment:
+      ENV_STORAGE_PATH: "${ENV_STORAGE_PATH}"
+      PROFILE: "${PROFILE}"
+      JWT_PRIVATE_KEY: "${JWT_PRIVATE_KEY}"
+      JWT_PUBLIC_KEY: "${JWT_PUBLIC_KEY}"
+      PORT: "${PORT}"
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1g"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://172.17.0.1:8080/api/storage/v1/health" ]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "127.0.0.1:8080:80"
+      - "172.17.0.1:8080:80"
+    volumes:
+      - ${HOST_DATA_DIR}:/root/.storage/
+      - /var/logs/storage-api/:/opt/logs

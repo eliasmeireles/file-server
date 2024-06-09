@@ -1,0 +1,65 @@
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api/file-server/v1/
+
+logging:
+  level:
+    org:
+#      springframework: DEBUG
+#      eclipse:
+#        jetty: DEBUG
+
+#springdoc:
+#  swagger-ui:
+#    config-url:
+#    path: /docs
+#    url: /v3/api-docs
+#    enabled: ${API_DOC_ENABLED:true}
+
+spring:
+  main:
+    web-application-type: servlet
+  storage:
+    storage-path: ${ENV_STORAGE_PATH:${user.home}/.storage/}
+    authorization-path: ${ENV_AUTHORIZATION_PATH:/opt/authorization/users.json}
+
+
+  servlet:
+    multipart:
+      file-size-threshold: 2KB
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
+  security:
+    issuer: storage-api
+    encrypt-strength: ${ENV_ENCRYPT_STRENGTH:10}
+    pub-key: ${ENV_JWT_PUBLIC_KEY}
+    private-key: ${ENV_JWT_PRIVATE_KEY}
+    stack-trace-log-enable: ${ENV_STACK_TRACE_LOG_ENABLE:true}
+    jwt-expiration-time: ${ENV_JWT_EXPIRATION_TIME:900}
+    paths-redirect:
+      - name: "swagger-ui/index.html"
+        value: [ "/", "/docs", "/swagger" ]
+    open-url:
+      - "/swagger-resources/**"
+      - "/swagger-ui.html/**"
+      - "/swagger-config/**"
+      - "/authorization/gen"
+      - "/file/download/**"
+      - "/favicon.ico/**"
+      - "/v3/api-docs/**"
+      - "/authorization"
+      - "/swagger-ui/**"
+      - "/v3/api-docs"
+      - "/webjars/**"
+      - "/password/**"
+      - "/swagger/**"
+      - "/health/**"
+      - "/assets/**"
+      - "/error/**"
+      - "/address"
+      - "/csrf/**"
+      - "/swagger"
+      - "/docs"
+      - "/"
