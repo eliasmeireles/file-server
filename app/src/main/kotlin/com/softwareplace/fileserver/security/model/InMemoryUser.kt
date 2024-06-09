@@ -2,7 +2,7 @@ package com.softwareplace.fileserver.security.model
 
 import com.softwareplace.springsecurity.model.UserData
 
-class InMemoryUser(
+data class InMemoryUser(
     private val username: String,
     private val password: String,
     private val authToken: String
