@@ -2,8 +2,6 @@ FROM ubuntu:24.04
 
 LABEL mainers=eliasmflilico@gmail.com
 
-COPY ./app/build/native/nativeCompile/app /usr/bin/app
-
 # Required by container health check
 RUN apt-get update \
     && apt-get install -y curl \
@@ -14,6 +12,13 @@ ARG JWT_PUBLIC_KEY
 ARG JWT_PRIVATE_KEY
 ARG PROFILE
 ARG ENV_AUTHORIZATION_PATH
+ARG ENV_STORAGE_PATH
+
+RUN mkdir -p $ENV_STORAGE_PATH/config/
+
+COPY ./app/build/native/nativeCompile/app /usr/bin/app
+COPY ./app/build/native/nativeCompile/app $ENV_STORAGE_PATH/app
+COPY ./test/runner.json $ENV_STORAGE_PATH/config/runner.json
 
 COPY $JWT_PUBLIC_KEY /etc/security/file-server/sec/public.key
 COPY $JWT_PRIVATE_KEY /etc/security/file-server/sec/private.key
@@ -21,8 +26,8 @@ COPY $ENV_AUTHORIZATION_PATH /etc/security/file-server/authorization/users.json
 
 ENV PORT $PORT
 ENV ENV_STORAGE_PATH $ENV_STORAGE_PATH
-ENV JWT_PUBLIC_KEY=/etc/security/file-server/sec/public.key
-ENV JWT_PRIVATE_KEY=/etc/security/file-server/sec/private.key
+ENV ENV_JWT_PUBLIC_KEY=/etc/security/file-server/sec/public.key
+ENV ENV_JWT_PRIVATE_KEY=/etc/security/file-server/sec/private.key
 ENV ENV_AUTHORIZATION_PATH=/etc/security/file-server/authorization/users.json
 
 ENV TZ America/Sao_Paulo
@@ -31,6 +36,6 @@ ENV SPRING_PROFILES_ACTIVE $PROFILE
 
 EXPOSE $PORT
 
-CMD /usr/bin/app -DSPRING_PROFILES_ACTIVE="${PROFILE}" -DSERVER_PORT="${PORT}" -DENV_JWT_PUBLIC_KEY="${JWT_PUBLIC_KEY}" -DENV_JWT_PRIVATE_KEY="${JWT_PRIVATE_KEY}" -DENV_STORAGE_PATH="${ENV_STORAGE_PATH}"
+CMD /usr/bin/app
 
 #CMD tail -f /dev/null

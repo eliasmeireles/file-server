@@ -1,9 +1,12 @@
-FROM docker.io/library/app:1.0.0 AS build
+FROM openjdk:21-jdk-slim AS builder
 
-FROM ubuntu:24.04
+COPY . /
+
+RUN ./gradlew clean bootJar
+
+FROM openjdk:21-jdk-slim
 
 LABEL mainers=eliasmflilico@gmail.com
-
 
 # Required by container health check
 RUN apt-get update \
@@ -19,8 +22,7 @@ ARG ENV_STORAGE_PATH
 
 RUN mkdir -p $ENV_STORAGE_PATH/config/
 
-COPY --from=build /workspace/com.softwareplace.fileserver.FileServerApplicationKt /usr/bin/app
-COPY --from=build /workspace/com.softwareplace.fileserver.FileServerApplicationKt /$ENV_STORAGE_PATH/app
+COPY --from=builder  app/build/libs/app-1.0.0.jar /app.jar
 COPY ./test/runner.json $ENV_STORAGE_PATH/config/runner.json
 
 COPY $JWT_PUBLIC_KEY /etc/security/file-server/sec/public.key
@@ -39,6 +41,5 @@ ENV SPRING_PROFILES_ACTIVE $PROFILE
 
 EXPOSE $PORT
 
-CMD /usr/bin/app
-
+CMD java -jar /app.jar
 #CMD tail -f /dev/null

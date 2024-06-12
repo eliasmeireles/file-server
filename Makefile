@@ -22,15 +22,10 @@ clean:
 
 boot-build-image:
 	./gradlew bootBuildImage
-	DOCKERFILE=DockerfileBootBuildImage docker-compose build file-server
-	make deploy
+	./docker-deployment DockerfileBootBuildImage
 
 local-builder:
 	make native-compile
-	DOCKERFILE=Dockerfile docker-compose build file-server
-	make deploy
+	./docker-deployment Dockerfile
 
-deploy:
-	docker-compose up -d --no-deps file-server
-	docker-compose logs -f file-server
 

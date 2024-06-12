@@ -202,6 +202,25 @@ components:
       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
   schemas:
+    RunnerConfig:
+      type: object
+      properties:
+        fibonacci:
+          type: integer
+          format: int32
+        objectSizeGenerator:
+          type: integer
+          format: int32
+        runNext:
+          type: boolean
+        cleanObjects:
+          type: boolean
+          default: false
+      required:
+        - fibonacci
+        - objectSizeGenerator
+        - runNext
+        - cleanObjects
     Data:
       type: object
       properties:

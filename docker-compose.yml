@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  file-server:
+  file-server-native:
     build:
       dockerfile: ${DOCKERFILE}
       context: .
@@ -12,14 +12,14 @@ services:
         JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
         ENV_STORAGE_PATH: ${ENV_STORAGE_PATH}
         ENV_AUTHORIZATION_PATH: ${ENV_AUTHORIZATION_PATH}
-    image: file-server
-    container_name: file-server
+    image: file-server-native
+    container_name: file-server-native
     restart: always
 
     deploy:
       resources:
         limits:
-          cpus: "1"
+          cpus: "2"
           memory: "1g"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://172.17.0.1:8080/api/file-server/v1/health" ]
@@ -30,5 +30,35 @@ services:
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     volumes:
-      - ${HOST_DATA_DIR}:/root/.storage/
-      - /opt/:/opt/
+      - ${HOST_DATA_DIR}:${ENV_STORAGE_PATH}
+      - ${HOST_DATA_DIR}/file-server-native/logs:/.logs
+  file-server-jar:
+    build:
+      dockerfile: DockerfileJar
+      context: .
+      args:
+        PROFILE: ${PROFILE}
+        PORT: ${CONTAINER_PORT}
+        JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+        JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+        ENV_STORAGE_PATH: ${ENV_STORAGE_PATH}
+        ENV_AUTHORIZATION_PATH: ${ENV_AUTHORIZATION_PATH}
+    image: file-server-jar
+    container_name: file-server-jar
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "1g"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://172.17.0.1:8080/api/file-server/v1/health" ]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 10s
+    ports:
+      - 8081:${CONTAINER_PORT}
+    volumes:
+      - ${HOST_DATA_DIR}:${ENV_STORAGE_PATH}
+      - ${HOST_DATA_DIR}/file-server-jar/logs:/.logs

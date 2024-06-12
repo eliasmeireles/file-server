@@ -21,9 +21,8 @@ spring:
   main:
     web-application-type: servlet
   storage:
-    storage-path: ${ENV_STORAGE_PATH:${user.home}/.storage/}
-    authorization-path: ${ENV_AUTHORIZATION_PATH:/opt/authorization/users.json}
-
+    storage-path: ${ENV_STORAGE_PATH}
+    authorization-path: ${ENV_AUTHORIZATION_PATH}
 
   servlet:
     multipart:
