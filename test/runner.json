@@ -1,0 +1,6 @@
+{
+  "runNext": false,
+  "fibonacci": 30,
+  "cleanObjects": false,
+  "objectSizeGenerator": 1000
+}
