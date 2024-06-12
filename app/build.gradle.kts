@@ -20,7 +20,7 @@ applyGraalvm()
 
 dependencies {
     logstashLogbackEncoderVersion()
-    springBootSecurityUtil()
+    springBootSecurityUtil(version = "1.0.6")
     springBootStartWeb()
     kotlinReactive()
 //    TODO: Fixe bug with jetty api

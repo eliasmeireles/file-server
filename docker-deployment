@@ -1,0 +1,15 @@
+#!/bin/sh
+
+
+deployment() {
+  DOCKERFILE=$1 docker-compose build
+  DOCKERFILE=$1 docker-compose up -d --no-deps
+}
+
+if [ -z "$1" ]; then
+  deployment Dockerfile
+else
+  deployment $1
+fi
+
+

@@ -1,4 +1,10 @@
-FROM ubuntu:24.04
+FROM openjdk:21-jdk-slim AS builder
+
+COPY . /
+
+RUN ./gradlew clean bootJar
+
+FROM openjdk:21-jdk-slim
 
 LABEL mainers=eliasmflilico@gmail.com
 
@@ -14,9 +20,7 @@ ARG PROFILE
 ARG ENV_AUTHORIZATION_PATH
 ARG ENV_STORAGE_PATH
 
-
-COPY ./app/build/native/nativeCompile/app /usr/bin/app
-COPY ./app/build/native/nativeCompile/app $ENV_STORAGE_PATH/app
+COPY --from=builder  app/build/libs/app-1.0.0.jar /app.jar
 
 COPY $JWT_PUBLIC_KEY /etc/security/file-server/sec/public.key
 COPY $JWT_PRIVATE_KEY /etc/security/file-server/sec/private.key
@@ -34,6 +38,5 @@ ENV SPRING_PROFILES_ACTIVE $PROFILE
 
 EXPOSE $PORT
 
-CMD /usr/bin/app
-
+CMD java -jar /app.jar
 #CMD tail -f /dev/null
