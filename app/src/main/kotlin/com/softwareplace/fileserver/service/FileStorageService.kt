@@ -57,6 +57,7 @@ class FileStorageService {
 
             val resource = UrlResource(path.toUri())
             return if (resource.exists()) {
+                kLogger.info("Loading resource {}, path: {}", filePath, resource.file.absolutePath)
                 resource
             } else {
                 throw FileNotFoundException("File not found $$filePath")
@@ -67,7 +68,7 @@ class FileStorageService {
 
     }
 
-    fun list(resource: String?): DataRest {
+    suspend fun list(resource: String?): DataRest {
         val list = mutableListOf<String>()
 
         val path = fileStorageLocation.resolve("$baseFilePath/${resource ?: ""}")
@@ -88,6 +89,8 @@ class FileStorageService {
         }
 
         getAllFilesPath(files)
+
+        kLogger.info("Files listed: resource {}, files: {}", resource, files)
 
         return DataRest(list)
     }
