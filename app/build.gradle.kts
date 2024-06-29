@@ -4,7 +4,6 @@ import com.github.softwareplace.springboot.kotlin.openapi.kotlinOpenApiSettings
 import com.github.softwareplace.springboot.kotlin.testKotlinMockito
 import com.github.softwareplace.springboot.utils.jsonLogger
 import com.github.softwareplace.springboot.utils.logstashLogbackEncoderVersion
-import com.github.softwareplace.springboot.utils.springBootSecurityUtil
 import com.github.softwareplace.springboot.utils.springBootStartWeb
 
 plugins {
@@ -20,7 +19,6 @@ applyGraalvm()
 
 dependencies {
     logstashLogbackEncoderVersion()
-    springBootSecurityUtil(version = "1.0.6")
     springBootStartWeb()
     kotlinReactive()
 //    TODO: Fixe bug with jetty api

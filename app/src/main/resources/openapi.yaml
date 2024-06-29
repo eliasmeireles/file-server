@@ -26,82 +26,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
 
-  /authorization:
-    post:
-      tags:
-        - Authorization
-      summary: Get api access authorization token
-      description: Get api access authorization token
-      operationId: getAuthorization
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserInfo"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Authorization"
-        '403':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-        '500':
-          description: Error request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-
-
-  /authorization/gen:
-    post:
-      tags:
-        - Authorization
-      summary: Return a user authorization data that can be used to access the api
-      description: Return a user authorization data that can be used to access the api
-      operationId: authorizationGen
-      parameters:
-        - $ref: "#/components/parameters/AccessToken"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserInfo"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserContent"
-        '403':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-        '500':
-          description: Error request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-
   /file/upload:
     post:
       tags:
         - File
       summary: Upload a single file
-      parameters:
-        - $ref: "#/components/parameters/AccessToken"
       operationId: uploadFile
       requestBody:
         required: true
@@ -169,7 +98,6 @@ paths:
       summary: List available files from storage path
       operationId: list
       parameters:
-        - $ref: "#/components/parameters/AccessToken"
         - name: resource
           in: query
           required: false
@@ -192,22 +120,15 @@ paths:
                 $ref: "#/components/schemas/Response"
 
 components:
-  parameters:
-    AccessToken:
-      in: header
-      required: true
-      name: Authorization
-      schema:
-        type: string
-      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-
   schemas:
     Data:
       type: object
       properties:
-        path:
+        files:
           items:
             type: string
+      required:
+        - files
     UploadFileResponse:
       type: object
       properties:
@@ -222,16 +143,6 @@ components:
           format: int64
         extension:
           type: string
-    UserInfo:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      required:
-        - username
-        - password
     Response:
       type: object
       properties:
@@ -248,27 +159,3 @@ components:
         - timestamp
         - message
         - success
-    UserContent:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-        authToken:
-          type: string
-      required:
-        - username
-        - password
-        - authToken
-
-    Authorization:
-      type: object
-      allOf:
-        - $ref: "#/components/schemas/Response"
-      properties:
-        jwt:
-          type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-      required:
-        - jwt

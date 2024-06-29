@@ -26,12 +26,11 @@ class FileControllerImpl(
             .body(resource)
     }
 
-    override suspend fun list(authorization: String, resource: String): ResponseEntity<DataRest> {
+    override suspend fun list(resource: String): ResponseEntity<DataRest> {
         return ResponseEntity.ok(fileStorageService.list(resource))
     }
 
     override suspend fun uploadFile(
-        authorization: String,
         resource: Resource,
         dirName: String,
         fileName: String

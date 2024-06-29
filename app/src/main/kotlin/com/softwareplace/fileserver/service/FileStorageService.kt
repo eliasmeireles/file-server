@@ -2,8 +2,8 @@ package com.softwareplace.fileserver.service
 
 import com.softwareplace.fileserver.file.exception.FileNotFoundException
 import com.softwareplace.fileserver.file.exception.FileStorageException
-import com.softwareplace.fileserver.properties.AppProperties
 import com.softwareplace.fileserver.rest.model.DataRest
+import com.softwareplace.jsonlogger.log.kLogger
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
@@ -16,27 +16,25 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 @Service
-class FileStorageService(
-    private val properties: AppProperties
-) {
+class FileStorageService {
 
-    private val fileStorageLocation: Path = Paths.get(properties.storagePath)
+    private final val baseFilePath = "${System.getProperty("user.home")}/file-server"
+    private val fileStorageLocation: Path = Paths.get(baseFilePath)
         .toAbsolutePath()
         .normalize()
 
     init {
         try {
+            kLogger.info("Target files path: ${fileStorageLocation.toUri()}")
             Files.createDirectories(this.fileStorageLocation)
         } catch (ex: Exception) {
             throw FileStorageException("Could not create the directory where the uploaded files will be stored.", ex)
         }
-
     }
 
     fun storeFile(file: Resource, fileName: String): String {
         try {
             val targetLocation = this.fileStorageLocation.resolve(fileName)
-
             val directory = File(targetLocation.toUri())
 
             if (!directory.exists()) {
@@ -53,7 +51,10 @@ class FileStorageService(
 
     fun loadFileAsResource(filePath: String): Resource {
         try {
-            val path = fileStorageLocation.resolve("${properties.storagePath}/$filePath").normalize()
+            val path = fileStorageLocation.resolve("$baseFilePath/$filePath")
+                .toAbsolutePath()
+                .normalize()
+
             val resource = UrlResource(path.toUri())
             return if (resource.exists()) {
                 resource
@@ -66,21 +67,27 @@ class FileStorageService(
 
     }
 
-    fun list(resource: String?): DataRest? {
+    fun list(resource: String?): DataRest {
         val list = mutableListOf<String>()
 
-        val path = fileStorageLocation.resolve("${properties.storagePath}/${resource ?: ""}").normalize()
+        val path = fileStorageLocation.resolve("$baseFilePath/${resource ?: ""}")
+            .toAbsolutePath()
+            .normalize()
 
         val files = path.toFile().listFiles()
-        files?.forEach {
-            if (it.isDirectory) {
-                it.listFiles()?.forEach { file ->
-                    list.add(file.path.replace(fileStorageLocation.toString(), ""))
+
+        fun getAllFilesPath(resource: Array<File>?) {
+            resource?.forEach {
+                if (it.isDirectory) {
+                    getAllFilesPath(it.listFiles())
+                } else {
+                    val basPath = "${fileStorageLocation}/"
+                    list.add(it.path.replace(basPath, ""))
                 }
-            } else {
-                list.add(it.path.replace(fileStorageLocation.toString(), ""))
             }
         }
+
+        getAllFilesPath(files)
 
         return DataRest(list)
     }
