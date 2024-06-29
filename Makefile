@@ -28,4 +28,7 @@ local-builder:
 	#make native-compile
 	./docker-deployment Dockerfile
 
+docker-image:
+	make native-compile
+	docker build -t file-server:latest . --no-cache
 
